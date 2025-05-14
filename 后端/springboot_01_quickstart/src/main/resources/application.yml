@@ -1,0 +1,19 @@
+server:
+    port: 8080
+
+spring:
+    data:
+        mongodb:
+            # ?????27017
+            database: critics
+            host: 43.139.73.118
+            port: 6666
+            username: critics
+            password: "J6OD^7+BUU_EO,j"
+            authentication-database: critics
+
+
+    web:
+        resources:
+            static-locations:
+              [ "classpath:/static/", "classpath:/public/","classpath:/mapper/","classpath:/templates/"]

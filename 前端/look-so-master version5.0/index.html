@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="referrer" content="no-referrer" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="./static/css/datouwang.css">
+    <title>电影推荐</title>
+    <script src="https://unpkg.com/js-bullets@latest/dist/BulletJs.min.js"></script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+    <div id="fav">
+    
+    </div>
+
+  </body>
+  
+  <script type="text/javascript" src="./static/js/jquery.min.js"></script>
+  <script type="text/javascript" src="./static/js/jquery.fly.min.js"></script>
+ 
+  <script>
+    $(function() {
+      var offset = $("#more-button").offset();
+      console.log(offset);
+      $(".text-wrap .addcar").click(function(event){
+        console.log("666");
+        var addcar = $(".text-wrap");
+        var img = addcar.parent().find('img').attr('src');
+        var flyer = $('<img class="u-flyer" src="'+img+'">');
+        flyer.fly({
+          start: {
+            left: event.pageX,
+            top: event.pageY
+          },
+          end: {
+            left: offset.left+10,
+            top: offset.top+10,
+            width: 0,
+            height: 0
+          },
+          onEnd: function(){
+            $("#msg").show().animate({width: '250px'}, 200).fadeOut(2000);
+            addcar.css("cursor","default").removeClass('orange').unbind('click');
+            this.destory();
+          }
+        });
+      });
+      
+    });
+</script>
+<style>
+  .el-card{
+    background-image: linear-gradient(180deg,#f0fbff,#fff);
+    border-radius: 8px;
+  }
+  .el-tabs--border-card{
+    background-image: linear-gradient(180deg,#f0fbff,#fff);
+    border-radius: 8px;
+  }
+  img{
+    border-radius: 5px;
+  }
+  .user-head{
+    border-radius: 2px;
+  }
+</style>
+</html>

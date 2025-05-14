@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+  <meta http-equiv="Access-Control-Allow-Origin" content="*" />
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <title>Bulletjs css 高性能弹幕</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background-image: url("https://img.xjh.me/random_img.php?return=302&ctype=nature&type=bg");
+    }
+    ::-webkit-scrollbar{
+      display: none;
+    }
+
+    .message-title{
+      font-size: 30px;
+      text-shadow: 0px 3px 0px #b2a98f, 0px 14px 10px rgba(0,0,0,0.15), 0px 24px 2px rgba(0,0,0,0.1), 0px 34px 30px rgba(0,0,0,0.1);
+    }
+
+    .danmu-content {
+      margin: 30px 10px;
+      height: 280px;
+    }
+
+    .opeate button {
+      margin: 10px;
+      border: 1px solid;
+    }
+
+    .screen {
+      /* width: 100vw; */
+      height: 100%;
+    }
+
+    .danmu-item {
+      margin: 5px;
+      border: 1px solid;
+      overflow: hidden;
+      display: inline-block;
+      word-break: keep-all;
+      white-space: nowrap;
+    }
+
+    .screen {
+      will-change: 'auto';
+    }
+
+    .__bullet-item-style {
+      position: absolute;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      height: 31px;
+      background-color: hsla(0, 0%, 100%, .2);
+      color: #fff;
+      border-radius: 20px;
+      padding: 0px 10px 0px 5px;
+
+    }
+
+    .__bullet-item-style img {
+      width: 20px;
+      height: 20px;
+      border-radius: 15px;
+      margin-left: 8px;
+      margin-top: 5px;
+      margin-right: 5px;
+    }
+
+    .__bullet-item-style span {
+      display: inline-block;
+      line-height: 31px;
+    }
+
+    .message-container2 {
+      position: absolute;
+      top: 65%;
+      left: 0;
+      right: 0;
+      text-align: center;
+      z-index: 5;
+      margin: 0 auto;
+      background-color: rgba(255, 255, 255, 0.11);
+      color: rgba(248, 248, 248, 0.726);
+      height: 35%;
+      border-radius: 6px;
+      backdrop-filter: blur(1.2px);
+    }
+    #username{
+      background-color: rgba(255, 255, 255, 0.562);
+    }
+    #d-input{
+      background-color: rgba(255, 255, 255, 0.562);
+    }
+    .message-input-wrapper {
+      display: flex;
+      justify-content: center;
+      height: 2.5rem;
+      margin-top: 2rem;
+    }
+    .message-input-wrapper input {
+      outline: none;
+      width: 70%;
+      border-radius: 20px;
+      height: 100%;
+      padding: 0 1.25rem;
+      color: rgb(139, 60, 60);
+      border: rgb(122, 47, 47) 1px solid;
+      
+    }
+    .message-input-wrapper input::-webkit-input-placeholder {
+      color: rgb(233, 148, 148);
+    }
+    .message-input-wrapper button {
+      outline: none;
+      border-radius: 20px;
+      height: 100%;
+      padding: 0 1.25rem;
+      border: rgb(143, 47, 47) 1px solid;
+      background-color: rgba(255, 255, 255, 0.562);
+    
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root">
+      <div class="danmu-content">
+        <div class="screen"></div>
+        <div class="opeate" style="display: none;">
+          <button id="pauseAll">暂停全部</button>
+          <button id="continueAll">继续全部</button>
+        </div>
+        <div class="opeate" style="display: none;">
+          <button class="close-time">暂停计时器</button>
+          <button class="open-time">继续计时器</button>
+        </div>
+        <div class="message-container2">
+          <h1 class="message-title">留言板</h1>
+          <div class="animate__animated animate__fadeInUp message-input-wrapper">
+            <input id="username" value=""
+                style="color: #1b1c1d; width: 20%"
+                
+            />
+            <input id="d-input"
+                style="color: #1b1c1d;"
+                placeholder="说点什么吧"
+            />
+            <button id="chat1" onclick="chat1()"class="ml-3 animate__animated animate__backInRight"
+            >上墙</button>
+          </div>
+        </div>
+
+      </div>
+  </div>
+</body>
+<script src="https://unpkg.com/js-bullets@latest/dist/BulletJs.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>  
+<script>
+  var checkList = [];
+  var danmuList = [];
+  var headerList= [];
+  var userinfo;
+  var movienumber = 0;
+  var page = 1;
+  var index = 0;
+  var danmuInterval;
+  var userReviewInterval
+  var size = 10
+  var nowcount=0
+  var flag = true
+  window.addEventListener('message', (e) => {
+    console.log(e);
+    checkList = e.data.checkList
+    movienumber = checkList.length
+    getdanmu()
+    userReviewInterval = setInterval(getUserReview,1000)
+    danmuInterval= setInterval(getdanmu,23*1500*movienumber)
+    console.log(checkList)
+    userinfo = e.data.userinfo
+    document.querySelector("#username").value = userinfo.username
+    
+  })
+  function getUserReview(){
+    axios.get("http://localhost:8080/chat/getLen", {
+        params: {
+          roomId: userinfo.roomId,
+          type: 1,
+        },
+      }).then((res) => {
+        console.log(res);
+        if(res.data.count-nowcount>10){
+          nowcount = res.data.count
+          axios.get("http://localhost:8080/chat/get", {
+            params: {
+              roomId: userinfo.roomId,
+              type: 1,
+              size:10
+            },
+          }).then((res) => {
+            console.log(res);
+            var originReviews = res.data.chats
+            for(var j = 0; j < originReviews.length;j++){
+              if(originReviews[j].username!=userinfo.username){
+                danmuList.splice(index+j+1,0,originReviews[j].content)
+                headerList.splice(index+j+1,0,"http://localhost:8080/file/download/" +originReviews[j].headId)
+              }
+            }
+          });
+      }else if(res.data.count>nowcount){
+        temp = res.data.count-nowcount
+        nowcount = res.data.count
+        axios.get("http://localhost:8080/chat/get", {
+            params: {
+              roomId: userinfo.roomId,
+              type: 1,
+              size: temp
+            },
+          }).then((res) => {
+            console.log(res);
+            var originReviews = res.data.chats
+            for(var j = 0; j < originReviews.length;j++){
+              if(originReviews[j].username!=userinfo.username){
+                danmuList.splice(index+j+1,0,originReviews[j].content)
+                headerList.splice(index+j+1,0,"http://localhost:8080/file/download/" +originReviews[j].headId)
+              }
+            }
+          });  
+        }
+      })
+  }
+  function getdanmu() {
+    for (var i = 0; i < this.checkList.length; i++) {
+      var nowId = checkList[i];
+      axios.get("http://localhost:8080/getMovieDetailReviews", {
+        params: {
+          movieId: nowId,
+          page: page,
+        },
+      }).then((res) => {
+        console.log(res.data.hotReviews);
+        var originReviews = res.data.hotReviews
+        for(var j = 0; j < originReviews.length;j++){
+          danmuList.push(originReviews[j].commentContent)
+          headerList.push(originReviews[j].photoUrl)
+        }
+        if(flag){
+          danmuTest.init();
+        }
+        flag = false
+
+      });
+    }
+    if (page < 6) {
+      page = page + 1;
+    } else {
+      stopdanmuInterval()
+    }
+  }
+  function stopdanmuInterval(){
+    clearInterval(danmuInterval)
+  }
+
+  function chat1(){
+    if (document.querySelector('#d-input').value == ""){
+        this.$message.error("昵称不能为空")
+        return false;
+      }
+      if (document.querySelector('#d-input').value == ""){
+        this.$message.error("留言不能为空")
+        return false;
+      }
+      axios.get('http://localhost:8080/chat/add', {
+        params: {
+          roomId:userinfo.roomId,
+          username: userinfo.username,
+          content:document.querySelector('#d-input').value,
+          headId:userinfo.headId,
+          type : 1
+        }
+      }).then((res) => {
+        return Promise.resolve(res.data)
+      })
+
+
+  }
+  const getRandom = (min, max) =>
+    parseInt(Math.random() * (max - min + 1)) + min;
+
+  const danmuTest = {
+    screen: null,
+    handler: null,
+    dom: {
+      closeTime: document.querySelector('.close-time'),
+      openTime: document.querySelector('.open-time'),
+      sendDanmu: document.querySelector('#chat1'),
+      dInput: document.querySelector('#d-input'),
+      pauseAll: document.querySelector('#pauseAll'),
+      continueAll: document.querySelector('#continueAll'),
+    },
+    init() {
+      this.eventInit();
+      this.screen = new BulletJs('.screen', {
+        trackHeight: 35,
+        speed: undefined,
+        pauseOnClick: true,
+        pauseOnHover: true,
+      });
+      this.sendDanmu();
+    },
+    sendDanmu() {
+      this.sendAction();
+    },
+    sendAction() {
+      this.handler = setInterval(() => {
+        if(index<movienumber*120||danmuList[index]==null){
+          index = index+1
+        }else{
+          index = 0
+        };
+        const str = danmuList[index];
+        const photo = headerList[index]
+        const dom = `<img class="avater" src="${photo}"><span>${str}</span>`;
+        this.screen.push(dom);
+      }, 1500);
+    },
+    // 暂停
+    pause() {
+      this.screen.pause();
+    },
+    // 继续
+    continue() {
+      this.screen.resume();
+    },
+    closeTime() {
+      this.handler && clearInterval(this.handler);
+    },
+    eventInit() {
+      this.dom.closeTime.addEventListener('click', () => {
+        this.closeTime();
+      });
+      this.dom.openTime.addEventListener('click', () => {
+        this.sendDanmu();
+      });
+
+      this.dom.sendDanmu.addEventListener('click', () => {
+        const value = this.dom.dInput.value;
+        // 此处一定要对用户输入进行过滤防止 xss 攻击
+        const escapeHTML = value
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\"/g, '&quot;')
+          .replace(/\'/g, '&#39;')
+          .replace(/\//g, '&#x2F;');
+        console.log('escapeHTML--->', escapeHTML);
+        if (value) {
+          var photo ="http://localhost:8080/file/download/" + userinfo.headId
+          const danmu = `<img class="avater" src="${photo}"><span style="color: color: rgba(233, 148, 148, 0.933);;">${escapeHTML}</span>`;
+          this.screen.push(
+            danmu,
+            {
+              onStart: (id, danmu) => {
+                // console.log('实例的方法onStart----->', 'id------->', id, 'danmu-------->', danmu)
+              },
+              onEnd: (id, danmu) => {
+                // console.log('实例的方法onEnd----->', 'id------->', id, 'danmu-------->', danmu)
+              },
+            },
+            true
+          );
+        } else {
+          alert('请输入要发送的弹幕');
+        }
+      });
+
+      this.dom.pauseAll.addEventListener('click', () => {
+        this.pause();
+      });
+
+      this.dom.continueAll.addEventListener('click', () => {
+        this.continue();
+      });
+    },
+  };
+
+
+</script>
+
+</html>

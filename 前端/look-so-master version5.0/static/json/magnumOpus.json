@@ -1,0 +1,29 @@
+{
+    "magnumOpus": [
+        {
+            "magnumOpusId": 1,
+            "magnumOpusNick": "戏铃人",
+            "magnumOpusHead": "/static/img/head.JPG"
+        },
+        {
+            "magnumOpusId": 2,
+            "magnumOpusNick": "戏铃人",
+            "magnumOpusHead": "/static/img/head.JPG"
+        },
+        {
+            "magnumOpusId": 3,
+            "magnumOpusNick": "戏铃人",
+            "magnumOpusHead": "/static/img/head.JPG"
+        },
+        {
+            "magnumOpusId": 4,
+            "magnumOpusNick": "戏铃人",
+            "magnumOpusHead": "/static/img/head.JPG"
+        },
+        {
+            "magnumOpusId": 5,
+            "magnumOpusNick": "戏铃人",
+            "magnumOpusHead": "/static/img/head.JPG"
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "user": {
+        "userType": 1,
+        "userId": 1,
+        "userName": "戏铃人",
+        "userHead": "/static/img/head.JPG",
+        "address":"福州",
+        "age":"19",
+        "sex":"男",
+        "info":"12345677",
+        "tel":"1143414",
+        "like":"冒险"
+    }
+}
